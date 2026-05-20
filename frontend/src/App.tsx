@@ -21,7 +21,7 @@ async function loadReport(): Promise<TelemetryReport> {
     await new Promise((resolve) => window.setTimeout(resolve, MOCK_LATENCY_MS));
     return processedReport as unknown as TelemetryReport;
   }
-  const response = await fetch('/api/metrics');
+  const response = await fetch('/api/metrics/live');
   if (!response.ok) {
     throw new Error(`API responded with ${response.status}`);
   }

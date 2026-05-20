@@ -112,9 +112,11 @@ uvicorn telemetry_processor.api:app --reload --host 0.0.0.0 --port 8000
 The API exposes:
 
 - `GET /health`
-- `POST /process`
+- `GET /metrics` — processes `data/events.json` and returns the full report
+- `GET /metrics/live` — returns metrics from the in-memory fleet simulator (see below)
+- `POST /process` — processes a caller-supplied event array
 
-Example request body:
+Example request body for `POST /process`:
 
 ```json
 {
@@ -127,6 +129,25 @@ Example request body:
   ]
 }
 ```
+
+## Live simulator
+
+`telemetry_processor/simulator.py` runs a synthetic two-cell fleet in a background thread. On startup it seeds three hours of simulated history, then appends new events every three real seconds (each tick advances the simulation clock by 30 seconds). The event log is capped at 1 000 entries; the oldest events are evicted as new ones arrive.
+
+Each cell follows a simple probabilistic state machine:
+
+| From state | Possible transitions | Notes |
+| --- | --- | --- |
+| `running` | `running` → fault (4 % / tick) | fault code drawn from E001–E101 |
+| `running` | `running` → paused (3 % / tick) | |
+| `running` | cycle start (35 % / tick, if no active cycle) | |
+| `running` | cycle end (45 % / tick, once cycle is ≥ 60 s old) | duration derived from timestamps |
+| `fault` | `fault` → running (55 % / tick) | |
+| `paused` | `paused` → running (65 % / tick) | |
+
+`GET /metrics/live` runs the accumulated event log through the same normalization and metric pipeline as the static endpoint, so availability, cycle times, fault counts, and the throughput chart all update on each frontend poll.
+
+The frontend connects to this endpoint when `VITE_USE_MOCK=false` is set in `frontend/.env.local`. The dashboard polls every five seconds; each poll produces genuinely different numbers as new events accumulate.
 
 ## Run the frontend dashboard
 

@@ -9,6 +9,7 @@ from typing import Any
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s %(message)s')
 
 from .pipeline import process_raw_events
+from .simulator import get_simulator
 
 _DEFAULT_DATA_FILE = Path(__file__).parent.parent.parent / "data" / "events.json"
 DATA_FILE = Path(os.environ.get("TELEMETRY_DATA_FILE", str(_DEFAULT_DATA_FILE)))
@@ -50,6 +51,10 @@ try:
             return process_raw_events(events)
         except ValueError as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    @app.get("/metrics/live")
+    def get_live_metrics() -> dict[str, Any]:
+        return process_raw_events(get_simulator().get_events())
 
     @app.post("/process")
     def process_telemetry(request: ProcessTelemetryRequest) -> dict[str, Any]:
