@@ -96,6 +96,12 @@ h2 {
   font-size: 0.8rem;
 }
 
+.hero-pill-clock {
+  font-size: 1.6rem;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

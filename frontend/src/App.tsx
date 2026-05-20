@@ -11,7 +11,7 @@ const USE_MOCK = import.meta.env['VITE_USE_MOCK'] !== 'false';
 
 type LoadState =
   | { status: 'loading' }
-  | { status: 'loaded'; report: TelemetryReport }
+  | { status: 'loaded'; report: TelemetryReport; fetchedAt: Date }
   | { status: 'empty' }
   | { status: 'error'; message: string };
 
@@ -39,7 +39,7 @@ export default function App() {
           setState({ status: 'empty' });
           return;
         }
-        setState({ status: 'loaded', report });
+        setState({ status: 'loaded', report, fetchedAt: new Date() });
       })
       .catch((error: unknown) => {
         setState({
@@ -59,5 +59,5 @@ export default function App() {
   if (state.status === 'loading') return <LoadingState />;
   if (state.status === 'empty') return <EmptyState />;
   if (state.status === 'error') return <ErrorState message={state.message} onRetry={() => refresh(true)} />;
-  return <Dashboard report={state.report} />;
+  return <Dashboard report={state.report} fetchedAt={state.fetchedAt} />;
 }

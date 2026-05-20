@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Activity, Gauge, TimerReset, Wrench } from 'lucide-react';
 import { TelemetryReport } from '../types';
 import { formatDateTime, formatNumber, formatPercent, formatSeconds } from '../lib/format';
@@ -7,7 +8,26 @@ import { FaultList } from './FaultList';
 import { MetricCard } from './MetricCard';
 import { ThroughputChart } from './ThroughputChart';
 
-export function Dashboard({ report }: { report: TelemetryReport }) {
+const timeFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
+function useNow(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  return now;
+}
+
+export function Dashboard({ report, fetchedAt }: { report: TelemetryReport; fetchedAt: Date }) {
+  const now = useNow();
+  const age = Math.floor((now.getTime() - fetchedAt.getTime()) / 1000);
+  const ageLabel = age < 5 ? 'just now' : `${age}s ago`;
+
   return (
     <main className="dashboard-shell">
       <header className="hero">
@@ -19,8 +39,8 @@ export function Dashboard({ report }: { report: TelemetryReport }) {
           </p>
         </div>
         <div className="hero-pill">
-          <span>Generated</span>
-          <strong>{formatDateTime(report.generated_at)}</strong>
+          <strong className="hero-pill-clock">{timeFormatter.format(now)}</strong>
+          <span>updated {ageLabel}</span>
         </div>
       </header>
 
