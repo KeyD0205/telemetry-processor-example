@@ -39,12 +39,24 @@ This is a full-stack implementation of the telemetry assignment. It includes:
 
 From the repository root:
 
+macOS/Linux:
+
 ```bash
 cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 pytest -q
+```
+
+Windows PowerShell:
+
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+python -m pytest -q
 ```
 
 Expected test result:
@@ -55,17 +67,35 @@ Expected test result:
 
 ## Run the processing pipeline
 
+macOS/Linux:
+
 ```bash
 PYTHONPATH=backend python -m telemetry_processor.cli data/events.json
 ```
 
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH = "backend"
+python -m telemetry_processor.cli data/events.json
+```
+
 Write the full JSON report:
+
+macOS/Linux:
 
 ```bash
 PYTHONPATH=backend python -m telemetry_processor.cli data/events.json --format json --output reports/metrics.json
 ```
 
-Or use the Makefile:
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH = "backend"
+python -m telemetry_processor.cli data/events.json --format json --output reports/metrics.json
+```
+
+Or use the Makefile on systems with `make` available:
 
 ```bash
 make test
