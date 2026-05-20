@@ -15,7 +15,7 @@ export function FaultList({ faults }: { faults: FaultEvent[] }) {
   }
 
   return (
-    <section className="card">
+    <section className="card fault-card">
       <div className="section-title-row">
         <h2>Recent faults and alerts</h2>
         <span className="muted">{faults.length} shown</span>

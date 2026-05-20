@@ -177,7 +177,34 @@ h2 {
 }
 
 .chart-card {
-  min-height: 348px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-fill {
+  flex: 1;
+  min-height: 0;
+}
+
+.fault-card {
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+}
+
+.fault-card .fault-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.quality-card .quality-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .section-title-row {
@@ -262,8 +289,8 @@ tbody tr:last-child td {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px;
-  padding: 14px;
-  border-radius: 18px;
+  padding: 12px;
+  border-radius: 14px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
 }
@@ -278,7 +305,7 @@ tbody tr:last-child td {
 .empty-copy {
   margin: 4px 0;
   color: #475569;
-  line-height: 1.45;
+  line-height: 1.35;
 }
 
 .quality-item {
@@ -338,8 +365,13 @@ tbody tr:last-child td {
   }
 
   .wide-card,
-  .chart-card {
+  .chart-card,
+  .quality-card {
     grid-column: 1 / -1;
+  }
+
+  .quality-card .quality-list {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -361,5 +393,16 @@ tbody tr:last-child td {
 
   .metric-card {
     min-height: 128px;
+  }
+
+  .chart-card,
+  .fault-card {
+    height: auto;
+    max-height: none;
+  }
+
+  .chart-fill {
+    height: 260px;
+    flex: 0 0 auto;
   }
 }

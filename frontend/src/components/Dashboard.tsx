@@ -35,7 +35,7 @@ export function Dashboard({ report, fetchedAt }: { report: TelemetryReport; fetc
           <p className="eyebrow">Robot cell operations</p>
           <h1>Telemetry health dashboard</h1>
           <p className="hero-copy">
-            Window {formatDateTime(report.window.start)} → {formatDateTime(report.window.end)} · {report.cell_count} cells · {report.normalized_event_count} normalized events
+            Observed period {formatDateTime(report.window.start)} {'->'} {formatDateTime(report.window.end)} | {report.cell_count} cells | {report.normalized_event_count} normalized events
           </p>
         </div>
         <div className="hero-pill">

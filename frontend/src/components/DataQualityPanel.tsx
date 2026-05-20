@@ -6,7 +6,7 @@ export function DataQualityPanel({ issues }: { issues: DataQualityIssue[] }) {
   const shown = warningsAndErrors.length ? warningsAndErrors : issues.slice(0, 6);
 
   return (
-    <section className="card">
+    <section className="card wide-card quality-card">
       <div className="section-title-row">
         <h2>Data quality</h2>
         <span className="muted">{issues.length} total findings</span>
@@ -17,7 +17,7 @@ export function DataQualityPanel({ issues }: { issues: DataQualityIssue[] }) {
         <div className="quality-list">
           {shown.slice(0, 8).map((issue) => (
             <article className={`quality-item severity-${issue.severity}`} key={`${issue.code}-${issue.source_index}`}>
-              <strong>{issue.code.replaceAll('_', ' ')}</strong>
+              <strong>{issue.code.replace(/_/g, ' ')}</strong>
               <p>{issue.message}</p>
               <span className="muted">{issue.cell_id ?? 'unknown cell'} · {formatDateTime(issue.timestamp)}</span>
             </article>
