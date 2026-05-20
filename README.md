@@ -7,6 +7,9 @@ This is a full-stack implementation of the telemetry assignment. It includes:
 - a frontend dashboard that presents current state, operational metrics, recent faults, throughput over time, cell comparison, loading states, empty states, and data-quality handling;
 - a summary report and dashboard screenshot preview.
 
+<img width="1276" height="851" alt="image" src="https://github.com/user-attachments/assets/545607cd-fe28-4e3f-a895-b85219970f41" />
+
+
 ## Repository structure
 
 ```text
