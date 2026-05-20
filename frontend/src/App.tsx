@@ -6,6 +6,8 @@ import { TelemetryReport } from './types';
 import './styles/app.css';
 
 const MOCK_LATENCY_MS = 500;
+const POLL_INTERVAL_MS = 5000;
+const USE_MOCK = import.meta.env['VITE_USE_MOCK'] !== 'false';
 
 type LoadState =
   | { status: 'loading' }
@@ -14,16 +16,12 @@ type LoadState =
   | { status: 'error'; message: string };
 
 async function loadReport(): Promise<TelemetryReport> {
-  if (import.meta.env['VITE_USE_MOCK'] !== 'false') {
-    // Mock path: set VITE_USE_MOCK=false in .env to hit the real API instead.
+  if (USE_MOCK) {
+    // Mock path: set VITE_USE_MOCK=false in .env.local to hit the real API instead.
     await new Promise((resolve) => window.setTimeout(resolve, MOCK_LATENCY_MS));
     return processedReport as unknown as TelemetryReport;
   }
-  const response = await fetch('/api/process', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ events: [] }),
-  });
+  const response = await fetch('/api/metrics');
   if (!response.ok) {
     throw new Error(`API responded with ${response.status}`);
   }
@@ -33,8 +31,8 @@ async function loadReport(): Promise<TelemetryReport> {
 export default function App() {
   const [state, setState] = useState<LoadState>({ status: 'loading' });
 
-  const refresh = useCallback(() => {
-    setState({ status: 'loading' });
+  const refresh = useCallback((showLoadingSpinner = false) => {
+    if (showLoadingSpinner) setState({ status: 'loading' });
     loadReport()
       .then((report) => {
         if (!report.cells.length) {
@@ -52,11 +50,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    refresh();
+    refresh(true);
+    if (USE_MOCK) return;
+    const id = window.setInterval(() => refresh(false), POLL_INTERVAL_MS);
+    return () => window.clearInterval(id);
   }, [refresh]);
 
   if (state.status === 'loading') return <LoadingState />;
   if (state.status === 'empty') return <EmptyState />;
-  if (state.status === 'error') return <ErrorState message={state.message} onRetry={refresh} />;
+  if (state.status === 'error') return <ErrorState message={state.message} onRetry={() => refresh(true)} />;
   return <Dashboard report={state.report} />;
 }
