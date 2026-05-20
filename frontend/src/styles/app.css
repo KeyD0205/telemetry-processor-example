@@ -35,10 +35,10 @@ textarea {
 }
 
 .hero {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
-  align-items: flex-start;
+  align-items: center;
   padding: 28px;
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.86);
@@ -84,6 +84,7 @@ h2 {
   min-width: 180px;
   display: grid;
   gap: 4px;
+  justify-items: start;
   padding: 14px 16px;
   border-radius: 18px;
   background: #0f172a;
@@ -383,7 +384,21 @@ tbody tr:last-child td {
 
   .hero {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
     padding: 22px;
+  }
+
+  .hero-pill {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    justify-items: start;
+  }
+
+  .hero-pill-clock {
+    font-size: 1.25rem;
   }
 
   .metrics-grid,
