@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T05:32:46.522609Z",
+  "generated_at": "2026-05-20T12:41:49.048652Z",
   "event_count": 24,
   "cell_count": 2,
   "window": {
@@ -15,6 +15,10 @@
     "fault_seconds": 180.0,
     "availability": 0.6547,
     "throughput_cycles_per_hour": 12.95,
+    "production_count_events": 0,
+    "latest_production_count_total": null,
+    "produced_units_delta": 0,
+    "operator_action_count": 0,
     "cycle_time_seconds": {
       "avg": 80.0,
       "median": 70.0,
@@ -88,6 +92,11 @@
       "productive_ratio_excluding_maintenance": 0.6923,
       "throughput_cycles_per_hour": 13.846,
       "completed_cycles": 3,
+      "production_count_events": 0,
+      "latest_production_count": null,
+      "produced_units_delta": 0,
+      "production_count_resets": 0,
+      "operator_action_count": 0,
       "cycle_time_seconds": {
         "avg": 90.0,
         "median": 90.0,
@@ -229,6 +238,11 @@
       "productive_ratio_excluding_maintenance": 0.6066,
       "throughput_cycles_per_hour": 11.803,
       "completed_cycles": 2,
+      "production_count_events": 0,
+      "latest_production_count": null,
+      "produced_units_delta": 0,
+      "production_count_resets": 0,
+      "operator_action_count": 0,
       "cycle_time_seconds": {
         "avg": 65.0,
         "median": 65.0,
@@ -373,7 +387,7 @@
         "message": "Dropped exact duplicate raw event.",
         "source_index": 9,
         "context": {
-          "event_id": "469808a4cbcc244051c8"
+          "event_id": "469808a4cbcc244051c8c93f599020b50d201c03e4d06862001133eb10972292"
         }
       },
       {

@@ -165,7 +165,7 @@ npm run dev
 
 The dashboard connects to `GET /metrics/live` and polls every five seconds. Start the API first (see above), then start the frontend. No additional configuration is needed - the Vite dev server proxies `/api/*` to `http://localhost:8000`.
 
-To use static mock data instead (no backend required), set `VITE_USE_MOCK=true` in `frontend/.env.local`.
+To use static mock data instead (no backend required), set `VITE_USE_MOCK=true` in `frontend/.env.local`. The mock frontend report mirrors the backend JSON contract and is used only in this mock mode.
 
 ### Frontend tests
 
