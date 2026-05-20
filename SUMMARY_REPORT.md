@@ -43,7 +43,8 @@ The implementation is intentionally deterministic and side-effect free in the co
 
 - React/Vite dashboard under `frontend`.
 - Shows current cell state, fleet metrics, cell comparison, throughput over time, recent faults, loading/empty/error states, and data quality findings.
-- Uses backend-generated processed data as the mocked UI data source, keeping calculations centralized in the backend.
+- Wired to `GET /metrics/live` on the backend, polling every 5 seconds so metrics update without a page refresh. A live clock ticks every second in the header and a "updated Xs ago" counter resets on each successful poll.
+- A fleet simulator (`telemetry_processor/simulator.py`) seeds three hours of synthetic history on startup and appends new events every three seconds, giving the dashboard genuinely changing metrics for demonstration without a live robot fleet.
 
 ## Key results from the provided telemetry stream
 
@@ -118,6 +119,28 @@ Version schema adapters and normalization rules. Recompute by replaying raw even
 ### Multiple robot types
 
 Add robot-specific adapters that map vendor events into the same canonical event model. The metric logic and dashboard do not need to know the source robot type once events are normalized.
+
+## Frontend notes
+
+### Operator vs engineer metrics
+
+Operators and engineers need different views of the same data.
+
+Operators care about actionable, now-focused information: current cell state, whether the line is running or stopped, active faults and how long ago they fired, and whether throughput is on target for the shift. They need immediate answers to "is anything wrong right now?" and "has anything changed since I last looked?". The metric cards (availability, completed cycles, fault time) and the recent faults panel are their primary surfaces.
+
+Engineers need historical and diagnostic depth: cycle-time distribution (avg, median, p95), state-duration breakdown, data-quality issue counts and raw messages, throughput trend over multiple hours, and fault-code frequency. They need to answer "why did availability drop this morning?" and "which fault code is recurring?". The throughput chart, cell comparison table, and data quality panel serve this audience.
+
+A production dashboard should surface these two audiences as separate views or at least clearly separate above-the-fold (operator) from below-the-fold (engineer) content.
+
+### UI scaling to many cells
+
+The current dashboard assumes two cells and hard-codes a side-by-side comparison table. To scale to many cells:
+
+- Replace the table with a filterable cell grid, one card per cell, showing state badge, availability, and fault indicator. Operators can scan at a glance and click into a cell detail view.
+- Move the throughput chart and fault list into a per-cell drill-down page rather than showing fleet aggregates alongside individual cells.
+- Add a fleet summary header row (total cells, cells in fault, fleet availability) that is always visible regardless of how many cells are present.
+- Filter and sort controls (by state, by availability, by fault count) become essential once there are more than 8–10 cells.
+- Consider virtualising the cell list for very large fleets (50+ cells) to keep rendering cost flat.
 
 ## Recommendations for further automation and scalability
 
