@@ -1,0 +1,221 @@
+[
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480400, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "sleep",
+      "program_state": "stop",
+      "program_id": "",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480460, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480520, "nanosec": 0 },
+    "event_type": "cycle_start"
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480580, "nanosec": 0 },
+    "event_type": "cycle_end",
+    "cycle_duration_seconds": 60
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480640, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-human-in-slow-zone",
+      "program_state": "play",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480700, "nanosec": 0 },
+    "event_type": "cycle_start"
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480820, "nanosec": 0 },
+    "event_type": "cycle_end",
+    "cycle_duration_seconds": 110
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480880, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-human-in-stop-zone",
+      "program_state": "pause",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480940, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712480940, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712481000, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "error-system-status",
+      "program_state": "stop",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": ["E-1001"],
+      "cell_error_messages": ["Joint 3 overcurrent detected."]
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712481060, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "error-system-status",
+      "program_state": "stop",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": ["E-1001", "E-2003"],
+      "cell_error_messages": ["Joint 3 overcurrent detected.", "Safety circuit triggered."]
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712481120, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "PCB_Testing",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712481090, "nanosec": 0 },
+    "event_type": "cycle_start"
+  },
+  {
+    "cell_id": "cell-a",
+    "event_time": { "sec": 1712481180, "nanosec": 0 },
+    "event_type": "cycle_end",
+    "cycle_duration_seconds": 90
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480400, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "td-waiting-for-human",
+      "program_state": "stop",
+      "program_id": "",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480520, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "Box_Inspection",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480580, "nanosec": 0 },
+    "event_type": "cycle_start"
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480650, "nanosec": 0 },
+    "event_type": "cycle_end",
+    "cycle_duration_seconds": 70
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480710, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "anomaly",
+      "program_state": "stop",
+      "program_id": "Box_Inspection",
+      "cell_error_codes": ["A-500"],
+      "cell_error_messages": ["Unexpected tool force reading."]
+    }
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480770, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-paused",
+      "program_state": "pause",
+      "program_id": "Box_Inspection",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480830, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "op-program-running",
+      "program_state": "play",
+      "program_id": "BoxInspection",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480890, "nanosec": 0 },
+    "event_type": "cycle_start"
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712480950, "nanosec": 0 },
+    "event_type": "cycle_end"
+  },
+  {
+    "cell_id": "cell-b",
+    "event_time": { "sec": 1712481010, "nanosec": 0 },
+    "cell_status": {
+      "cell_state": "mt-human-in-stop-zone",
+      "program_state": "stop",
+      "program_id": "",
+      "cell_error_codes": [],
+      "cell_error_messages": []
+    }
+  }
+]

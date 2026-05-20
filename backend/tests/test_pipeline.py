@@ -1,0 +1,54 @@
+import json
+from pathlib import Path
+
+from telemetry_processor.pipeline import process_file, process_raw_events
+
+ROOT = Path(__file__).resolve().parents[2]
+DATA_FILE = ROOT / "data" / "events.json"
+
+
+def test_processes_assignment_dataset_with_expected_metrics() -> None:
+    report = process_file(DATA_FILE)
+
+    assert report["cell_count"] == 2
+    assert report["normalized_event_count"] == 24  # one exact duplicate is dropped
+    assert report["fleet"]["completed_cycles"] == 5
+    assert report["fleet"]["cycle_time_seconds"]["avg"] == 80.0
+
+    cell_a = next(cell for cell in report["cells"] if cell["cell_id"] == "cell-a")
+    cell_b = next(cell for cell in report["cells"] if cell["cell_id"] == "cell-b")
+
+    assert cell_a["current_state"] == "running"
+    assert cell_a["completed_cycles"] == 3
+    assert cell_a["uptime_seconds"] == 540.0
+    assert cell_a["downtime_seconds"] == 240.0
+    assert cell_a["cycle_time_seconds"]["avg"] == 90.0
+    assert cell_a["unique_fault_codes"] == ["E-1001", "E-2003"]
+
+    assert cell_b["current_state"] == "maintenance"
+    assert cell_b["completed_cycles"] == 2
+    assert cell_b["cycle_time_seconds"]["avg"] == 65.0
+    assert cell_b["unique_fault_codes"] == ["A-500"]
+
+
+def test_detects_duration_mismatch_missing_duration_and_bad_cycle_state() -> None:
+    report = process_file(DATA_FILE)
+    issue_codes = {issue["code"] for issue in report["data_quality"]["issues"]}
+
+    assert "duplicate_event" in issue_codes
+    assert "out_of_order_event" in issue_codes
+    assert "cycle_duration_mismatch" in issue_codes
+    assert "missing_cycle_duration" in issue_codes
+    assert "normalized_program_id" in issue_codes
+    assert "cycle_started_while_not_productive" in issue_codes
+
+
+def test_cycle_end_without_start_is_reported() -> None:
+    raw = [
+        {"cell_id": "cell-x", "event_time": {"sec": 1, "nanosec": 0}, "event_type": "cycle_end"},
+    ]
+
+    report = process_raw_events(raw)
+
+    assert report["fleet"]["completed_cycles"] == 0
+    assert any(issue["code"] == "cycle_end_without_start" for issue in report["data_quality"]["issues"])

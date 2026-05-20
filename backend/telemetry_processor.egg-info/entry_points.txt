@@ -1,0 +1,2 @@
+[console_scripts]
+telemetry-process = telemetry_processor.cli:main

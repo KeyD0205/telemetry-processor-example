@@ -1,0 +1,547 @@
+{
+  "generated_at": "2026-05-11T05:32:46.522609Z",
+  "event_count": 24,
+  "cell_count": 2,
+  "window": {
+    "start": "2024-04-07T09:00:00Z",
+    "end": "2024-04-07T09:13:00Z"
+  },
+  "fleet": {
+    "completed_cycles": 5,
+    "observed_cell_seconds": 1390.0,
+    "uptime_seconds": 910.0,
+    "downtime_seconds": 480.0,
+    "maintenance_seconds": 0.0,
+    "fault_seconds": 180.0,
+    "availability": 0.6547,
+    "throughput_cycles_per_hour": 12.95,
+    "cycle_time_seconds": {
+      "avg": 80.0,
+      "median": 70.0,
+      "p95": 114.0
+    },
+    "throughput_over_time": [
+      {
+        "bucket_start": "2024-04-07T09:00:00Z",
+        "completed_cycles": 5
+      }
+    ],
+    "recent_faults": [
+      {
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:11:00Z",
+        "state": "fault",
+        "codes": [
+          "E-1001",
+          "E-2003"
+        ],
+        "messages": [
+          "Joint 3 overcurrent detected.",
+          "Safety circuit triggered."
+        ],
+        "program_id": "PCB_Testing"
+      },
+      {
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:10:00Z",
+        "state": "fault",
+        "codes": [
+          "E-1001"
+        ],
+        "messages": [
+          "Joint 3 overcurrent detected."
+        ],
+        "program_id": "PCB_Testing"
+      },
+      {
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:05:10Z",
+        "state": "fault",
+        "codes": [
+          "A-500"
+        ],
+        "messages": [
+          "Unexpected tool force reading."
+        ],
+        "program_id": "Box_Inspection"
+      }
+    ]
+  },
+  "cells": [
+    {
+      "cell_id": "cell-a",
+      "window": {
+        "start": "2024-04-07T09:00:00Z",
+        "end": "2024-04-07T09:13:00Z",
+        "observed_seconds": 780.0
+      },
+      "current_state": "running",
+      "current_program_id": "PCB_Testing",
+      "program_ids": [
+        "PCB_Testing"
+      ],
+      "uptime_seconds": 540.0,
+      "downtime_seconds": 240.0,
+      "maintenance_seconds": 0.0,
+      "fault_seconds": 120.0,
+      "availability": 0.6923,
+      "productive_ratio_excluding_maintenance": 0.6923,
+      "throughput_cycles_per_hour": 13.846,
+      "completed_cycles": 3,
+      "cycle_time_seconds": {
+        "avg": 90.0,
+        "median": 90.0,
+        "p95": 117.0,
+        "min": 60.0,
+        "max": 120.0
+      },
+      "state_durations_seconds": {
+        "sleep": 60.0,
+        "running": 300.0,
+        "slowed": 240.0,
+        "stopped": 60.0,
+        "fault": 120.0
+      },
+      "transitions": [
+        {
+          "from": "sleep",
+          "to": "running",
+          "at": "2024-04-07T09:01:00Z"
+        },
+        {
+          "from": "running",
+          "to": "slowed",
+          "at": "2024-04-07T09:04:00Z"
+        },
+        {
+          "from": "slowed",
+          "to": "stopped",
+          "at": "2024-04-07T09:08:00Z"
+        },
+        {
+          "from": "stopped",
+          "to": "running",
+          "at": "2024-04-07T09:09:00Z"
+        },
+        {
+          "from": "running",
+          "to": "fault",
+          "at": "2024-04-07T09:10:00Z"
+        },
+        {
+          "from": "fault",
+          "to": "fault",
+          "at": "2024-04-07T09:11:00Z"
+        },
+        {
+          "from": "fault",
+          "to": "running",
+          "at": "2024-04-07T09:12:00Z"
+        }
+      ],
+      "cycles": [
+        {
+          "cell_id": "cell-a",
+          "start": "2024-04-07T09:02:00Z",
+          "end": "2024-04-07T09:03:00Z",
+          "duration_seconds": 60.0,
+          "reported_duration_seconds": 60.0,
+          "derived_from_timestamps": true
+        },
+        {
+          "cell_id": "cell-a",
+          "start": "2024-04-07T09:05:00Z",
+          "end": "2024-04-07T09:07:00Z",
+          "duration_seconds": 120.0,
+          "reported_duration_seconds": 110.0,
+          "derived_from_timestamps": true
+        },
+        {
+          "cell_id": "cell-a",
+          "start": "2024-04-07T09:11:30Z",
+          "end": "2024-04-07T09:13:00Z",
+          "duration_seconds": 90.0,
+          "reported_duration_seconds": 90.0,
+          "derived_from_timestamps": true
+        }
+      ],
+      "throughput_over_time": [
+        {
+          "bucket_start": "2024-04-07T09:00:00Z",
+          "completed_cycles": 3
+        }
+      ],
+      "fault_event_count": 2,
+      "unique_fault_codes": [
+        "E-1001",
+        "E-2003"
+      ],
+      "recent_faults": [
+        {
+          "cell_id": "cell-a",
+          "timestamp": "2024-04-07T09:11:00Z",
+          "state": "fault",
+          "codes": [
+            "E-1001",
+            "E-2003"
+          ],
+          "messages": [
+            "Joint 3 overcurrent detected.",
+            "Safety circuit triggered."
+          ],
+          "program_id": "PCB_Testing"
+        },
+        {
+          "cell_id": "cell-a",
+          "timestamp": "2024-04-07T09:10:00Z",
+          "state": "fault",
+          "codes": [
+            "E-1001"
+          ],
+          "messages": [
+            "Joint 3 overcurrent detected."
+          ],
+          "program_id": "PCB_Testing"
+        }
+      ],
+      "data_quality_issue_counts": {
+        "cycle_duration_mismatch": 1,
+        "cycle_started_while_not_productive": 1
+      }
+    },
+    {
+      "cell_id": "cell-b",
+      "window": {
+        "start": "2024-04-07T09:00:00Z",
+        "end": "2024-04-07T09:10:10Z",
+        "observed_seconds": 610.0
+      },
+      "current_state": "maintenance",
+      "current_program_id": null,
+      "program_ids": [
+        "Box_Inspection"
+      ],
+      "uptime_seconds": 370.0,
+      "downtime_seconds": 240.0,
+      "maintenance_seconds": 0.0,
+      "fault_seconds": 60.0,
+      "availability": 0.6066,
+      "productive_ratio_excluding_maintenance": 0.6066,
+      "throughput_cycles_per_hour": 11.803,
+      "completed_cycles": 2,
+      "cycle_time_seconds": {
+        "avg": 65.0,
+        "median": 65.0,
+        "p95": 69.5,
+        "min": 60.0,
+        "max": 70.0
+      },
+      "state_durations_seconds": {
+        "waiting_for_human": 120.0,
+        "running": 370.0,
+        "paused": 60.0,
+        "fault": 60.0
+      },
+      "transitions": [
+        {
+          "from": "waiting_for_human",
+          "to": "running",
+          "at": "2024-04-07T09:02:00Z"
+        },
+        {
+          "from": "running",
+          "to": "fault",
+          "at": "2024-04-07T09:05:10Z"
+        },
+        {
+          "from": "fault",
+          "to": "paused",
+          "at": "2024-04-07T09:06:10Z"
+        },
+        {
+          "from": "paused",
+          "to": "running",
+          "at": "2024-04-07T09:07:10Z"
+        },
+        {
+          "from": "running",
+          "to": "maintenance",
+          "at": "2024-04-07T09:10:10Z"
+        }
+      ],
+      "cycles": [
+        {
+          "cell_id": "cell-b",
+          "start": "2024-04-07T09:03:00Z",
+          "end": "2024-04-07T09:04:10Z",
+          "duration_seconds": 70.0,
+          "reported_duration_seconds": 70.0,
+          "derived_from_timestamps": true
+        },
+        {
+          "cell_id": "cell-b",
+          "start": "2024-04-07T09:08:10Z",
+          "end": "2024-04-07T09:09:10Z",
+          "duration_seconds": 60.0,
+          "reported_duration_seconds": null,
+          "derived_from_timestamps": true
+        }
+      ],
+      "throughput_over_time": [
+        {
+          "bucket_start": "2024-04-07T09:00:00Z",
+          "completed_cycles": 2
+        }
+      ],
+      "fault_event_count": 1,
+      "unique_fault_codes": [
+        "A-500"
+      ],
+      "recent_faults": [
+        {
+          "cell_id": "cell-b",
+          "timestamp": "2024-04-07T09:05:10Z",
+          "state": "fault",
+          "codes": [
+            "A-500"
+          ],
+          "messages": [
+            "Unexpected tool force reading."
+          ],
+          "program_id": "Box_Inspection"
+        }
+      ],
+      "data_quality_issue_counts": {}
+    }
+  ],
+  "data_quality": {
+    "issue_count": 19,
+    "issues": [
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:01:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 1,
+        "context": {
+          "raw_state": "op-program-running",
+          "normalized_state": "running"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:04:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 4,
+        "context": {
+          "raw_state": "op-human-in-slow-zone",
+          "normalized_state": "slowed"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:08:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 7,
+        "context": {
+          "raw_state": "op-human-in-stop-zone",
+          "normalized_state": "stopped"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:09:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 8,
+        "context": {
+          "raw_state": "op-program-running",
+          "normalized_state": "running"
+        }
+      },
+      {
+        "severity": "warning",
+        "code": "duplicate_event",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:09:00Z",
+        "message": "Dropped exact duplicate raw event.",
+        "source_index": 9,
+        "context": {
+          "event_id": "469808a4cbcc244051c8"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:10:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 10,
+        "context": {
+          "raw_state": "error-system-status",
+          "normalized_state": "fault"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:11:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 11,
+        "context": {
+          "raw_state": "error-system-status",
+          "normalized_state": "fault"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:12:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 12,
+        "context": {
+          "raw_state": "op-program-running",
+          "normalized_state": "running"
+        }
+      },
+      {
+        "severity": "warning",
+        "code": "out_of_order_event",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:11:30Z",
+        "message": "Event arrived earlier than a previously ingested event for the same cell; downstream processing sorts by event time.",
+        "source_index": 13,
+        "context": {
+          "previous_timestamp": "2024-04-07T09:12:00Z"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:00:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 15,
+        "context": {
+          "raw_state": "td-waiting-for-human",
+          "normalized_state": "waiting_for_human"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:02:00Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 16,
+        "context": {
+          "raw_state": "op-program-running",
+          "normalized_state": "running"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:05:10Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 19,
+        "context": {
+          "raw_state": "anomaly",
+          "normalized_state": "fault"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:06:10Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 20,
+        "context": {
+          "raw_state": "op-program-paused",
+          "normalized_state": "paused"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:07:10Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 21,
+        "context": {
+          "raw_state": "op-program-running",
+          "normalized_state": "running"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "normalized_program_id",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:07:10Z",
+        "message": "Program id was normalized to a canonical value.",
+        "source_index": 21,
+        "context": {
+          "raw_program_id": "BoxInspection",
+          "normalized_program_id": "Box_Inspection"
+        }
+      },
+      {
+        "severity": "info",
+        "code": "missing_cycle_duration",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:09:10Z",
+        "message": "cycle_end does not include cycle_duration_seconds; duration will be derived from the matched cycle_start when possible.",
+        "source_index": 23,
+        "context": {}
+      },
+      {
+        "severity": "info",
+        "code": "normalized_cell_state",
+        "cell_id": "cell-b",
+        "timestamp": "2024-04-07T09:10:10Z",
+        "message": "Raw cell state was normalized to a canonical state.",
+        "source_index": 24,
+        "context": {
+          "raw_state": "mt-human-in-stop-zone",
+          "normalized_state": "maintenance"
+        }
+      },
+      {
+        "severity": "warning",
+        "code": "cycle_duration_mismatch",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:07:00Z",
+        "message": "Reported cycle_duration_seconds differs from timestamps; timestamp-derived duration is used.",
+        "source_index": 6,
+        "context": {
+          "reported_seconds": 110.0,
+          "derived_seconds": 120.0,
+          "cycle_start": "2024-04-07T09:05:00Z"
+        }
+      },
+      {
+        "severity": "warning",
+        "code": "cycle_started_while_not_productive",
+        "cell_id": "cell-a",
+        "timestamp": "2024-04-07T09:11:30Z",
+        "message": "cycle_start occurred while the cell was not in a productive state.",
+        "source_index": 13,
+        "context": {
+          "state_at_cycle_start": "fault"
+        }
+      }
+    ]
+  },
+  "normalized_event_count": 24,
+  "dropped_event_count": 1
+}
