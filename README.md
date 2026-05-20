@@ -13,12 +13,13 @@ This is a full-stack implementation of the telemetry assignment. It includes:
 .
 ├── backend/
 │   ├── telemetry_processor/
-│   │   ├── api.py               # FastAPI endpoint
+│   │   ├── api.py               # FastAPI endpoints
 │   │   ├── cli.py               # CLI renderer
 │   │   ├── metrics.py           # metric and cycle-pairing logic
 │   │   ├── models.py            # canonical event model
 │   │   ├── normalization.py     # schema drift and naming normalization
 │   │   ├── pipeline.py          # ingestion orchestration
+│   │   ├── simulator.py         # synthetic fleet simulator for live demo
 │   │   └── state_machine.py     # canonical states and transitions
 │   ├── tests/
 │   └── pyproject.toml
@@ -62,7 +63,7 @@ python -m pytest -q
 Expected test result:
 
 ```text
-6 passed
+10 passed
 ```
 
 ## Run the processing pipeline

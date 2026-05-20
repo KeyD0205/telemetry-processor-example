@@ -159,4 +159,4 @@ The current dashboard assumes two cells and hard-codes a side-by-side comparison
 - Exact duplicate detection is implemented now; fuzzy duplicate detection would require stronger source identifiers to avoid dropping legitimate repeated status events.
 - Timestamp-derived cycle time is used as the metric source of truth, even when reported duration exists. This is more consistent but assumes event timestamps are reliable.
 - The final known state is carried only until the last event timestamp in the cell's window. The system does not infer time beyond observed data.
-- The frontend uses processed mock data. This is appropriate for the assignment because the backend owns the metric logic, but production should fetch from a metrics API or subscribe to live updates.
+- The frontend polls `GET /metrics/live` every 5 seconds. The live endpoint runs the simulator's event log through the real pipeline on each request, so the dashboard reflects genuinely changing metrics. A production system would replace the simulator with a durable event log and expose a materialized read model rather than reprocessing on every poll.
