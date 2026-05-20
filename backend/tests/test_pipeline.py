@@ -52,3 +52,95 @@ def test_cycle_end_without_start_is_reported() -> None:
 
     assert report["fleet"]["completed_cycles"] == 0
     assert any(issue["code"] == "cycle_end_without_start" for issue in report["data_quality"]["issues"])
+
+
+def test_availability_is_uptime_over_observed_seconds() -> None:
+    # 120 s running, then 60 s fault → observed = 180 s, uptime = 120 s, availability ≈ 0.6667
+    raw = [
+        {
+            "cell_id": "cell-x",
+            "event_time": {"sec": 0, "nanosec": 0},
+            "cell_status": {"cell_state": "op-program-running", "program_state": "play",
+                            "program_id": "", "cell_error_codes": [], "cell_error_messages": []},
+        },
+        {
+            "cell_id": "cell-x",
+            "event_time": {"sec": 120, "nanosec": 0},
+            "cell_status": {"cell_state": "error-system-status", "program_state": "stop",
+                            "program_id": "", "cell_error_codes": ["E1"], "cell_error_messages": ["err"]},
+        },
+        {
+            "cell_id": "cell-x",
+            "event_time": {"sec": 180, "nanosec": 0},
+            "cell_status": {"cell_state": "op-program-running", "program_state": "play",
+                            "program_id": "", "cell_error_codes": [], "cell_error_messages": []},
+        },
+    ]
+
+    report = process_raw_events(raw)
+    cell = report["cells"][0]
+
+    assert cell["uptime_seconds"] == 120.0
+    assert cell["fault_seconds"] == 60.0
+    assert abs(cell["availability"] - round(120 / 180, 4)) < 1e-6
+
+
+def test_unexpected_state_transition_produces_quality_warning() -> None:
+    from telemetry_processor.normalization import normalize_events
+    from telemetry_processor.state_machine import validate_state_transitions
+
+    # sleep → fault is an allowed transition; sleep → paused is not
+    raw = [
+        {
+            "cell_id": "cell-x",
+            "event_time": {"sec": 0, "nanosec": 0},
+            "cell_status": {"cell_state": "sleep", "program_state": "stop",
+                            "program_id": "", "cell_error_codes": [], "cell_error_messages": []},
+        },
+        {
+            "cell_id": "cell-x",
+            "event_time": {"sec": 10, "nanosec": 0},
+            "cell_status": {"cell_state": "op-program-paused", "program_state": "pause",
+                            "program_id": "", "cell_error_codes": [], "cell_error_messages": []},
+        },
+    ]
+
+    events, _ = normalize_events(raw)
+    issues = validate_state_transitions(events)
+
+    assert any(issue.code == "unexpected_state_transition" for issue in issues)
+
+
+def test_api_health_endpoint() -> None:
+    from fastapi.testclient import TestClient
+    from telemetry_processor.api import app
+
+    client = TestClient(app)
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+def test_api_process_endpoint_returns_metrics() -> None:
+    from fastapi.testclient import TestClient
+    from telemetry_processor.api import app
+
+    client = TestClient(app)
+    payload = {
+        "events": [
+            {"cell_id": "cell-a", "event_time": {"sec": 0, "nanosec": 0},
+             "cell_status": {"cell_state": "op-program-running", "program_state": "play",
+                             "program_id": "PCB_Testing", "cell_error_codes": [], "cell_error_messages": []}},
+            {"cell_id": "cell-a", "event_time": {"sec": 60, "nanosec": 0}, "event_type": "cycle_start"},
+            {"cell_id": "cell-a", "event_time": {"sec": 120, "nanosec": 0},
+             "event_type": "cycle_end", "cycle_duration_seconds": 60},
+        ]
+    }
+
+    response = client.post("/process", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["fleet"]["completed_cycles"] == 1
+    assert data["cells"][0]["cycle_time_seconds"]["avg"] == 60.0
