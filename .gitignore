@@ -10,7 +10,7 @@ node_modules/
 dist/
 coverage/
 
-# Local env — contains VITE_USE_MOCK and other local overrides
+# Local env - contains VITE_USE_MOCK and other local overrides
 .env.local
 .env.*.local
 

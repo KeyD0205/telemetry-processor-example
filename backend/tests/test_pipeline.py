@@ -55,7 +55,7 @@ def test_cycle_end_without_start_is_reported() -> None:
 
 
 def test_availability_is_uptime_over_observed_seconds() -> None:
-    # 120 s running, then 60 s fault → observed = 180 s, uptime = 120 s, availability ≈ 0.6667
+    # 120 s running, then 60 s fault -> observed = 180 s, uptime = 120 s, availability approximately 0.6667
     raw = [
         {
             "cell_id": "cell-x",
@@ -89,7 +89,7 @@ def test_unexpected_state_transition_produces_quality_warning() -> None:
     from telemetry_processor.normalization import normalize_events
     from telemetry_processor.state_machine import validate_state_transitions
 
-    # sleep → fault is an allowed transition; sleep → paused is not
+    # sleep -> fault is an allowed transition; sleep -> paused is not
     raw = [
         {
             "cell_id": "cell-x",

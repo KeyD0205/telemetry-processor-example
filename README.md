@@ -14,29 +14,29 @@ This is a full-stack implementation of the telemetry assignment. It includes:
 
 ```text
 .
-├── backend/
-│   ├── telemetry_processor/
-│   │   ├── api.py               # FastAPI endpoints
-│   │   ├── cli.py               # CLI renderer
-│   │   ├── metrics.py           # metric and cycle-pairing logic
-│   │   ├── models.py            # canonical event model
-│   │   ├── normalization.py     # schema drift and naming normalization
-│   │   ├── pipeline.py          # ingestion orchestration
-│   │   ├── simulator.py         # synthetic fleet simulator for live demo
-│   │   └── state_machine.py     # canonical states and transitions
-│   ├── tests/
-│   └── pyproject.toml
-├── data/events.json             # assignment event stream for private submission
-├── frontend/
-│   ├── src/
-│   │   ├── components/          # dashboard components
-│   │   ├── mock/                # processed metrics used by UI demo
-│   │   └── types.ts
-│   └── package.json
-├── reports/metrics.json         # generated backend report
-├── screenshots/dashboard-preview.png
-├── SUMMARY_REPORT.md
-└── Makefile
+|-- backend/
+|   |-- telemetry_processor/
+|   |   |-- api.py               # FastAPI endpoints
+|   |   |-- cli.py               # CLI renderer
+|   |   |-- metrics.py           # metric and cycle-pairing logic
+|   |   |-- models.py            # canonical event model
+|   |   |-- normalization.py     # schema drift and naming normalization
+|   |   |-- pipeline.py          # ingestion orchestration
+|   |   |-- simulator.py         # synthetic fleet simulator for live demo
+|   |   `-- state_machine.py     # canonical states and transitions
+|   |-- tests/
+|   `-- pyproject.toml
+|-- data/events.json             # assignment event stream for private submission
+|-- frontend/
+|   |-- src/
+|   |   |-- components/          # dashboard components
+|   |   |-- mock/                # processed metrics used by UI demo
+|   |   `-- types.ts
+|   `-- package.json
+|-- reports/metrics.json         # generated backend report
+|-- screenshots/dashboard-preview.png
+|-- SUMMARY_REPORT.md
+`-- Makefile
 ```
 
 ## Backend setup
@@ -116,9 +116,9 @@ uvicorn telemetry_processor.api:app --reload --host 0.0.0.0 --port 8000
 The API exposes:
 
 - `GET /health`
-- `GET /metrics` — processes `data/events.json` and returns the full report
-- `GET /metrics/live` — returns metrics from the in-memory fleet simulator (see below)
-- `POST /process` — processes a caller-supplied event array
+- `GET /metrics` - processes `data/events.json` and returns the full report
+- `GET /metrics/live` - returns metrics from the in-memory fleet simulator (see below)
+- `POST /process` - processes a caller-supplied event array
 
 Example request body for `POST /process`:
 
@@ -138,16 +138,18 @@ Example request body for `POST /process`:
 
 `telemetry_processor/simulator.py` runs a synthetic two-cell fleet in a background thread. On startup it seeds three hours of simulated history, then appends new events every three real seconds (each tick advances the simulation clock by 30 seconds). The event log is capped at 1 000 entries; the oldest events are evicted as new ones arrive.
 
+This simulator is demo-only. It is intentionally useful for showing a changing dashboard, but it is not production-like: it is random, singleton-backed, starts a thread implicitly from the API module, and does not currently have seed- or invariant-based tests. Production ingestion should use an explicit event source and deterministic state handling. Tests for simulator behavior should use a fixed seed and assert core invariants such as monotonic timestamps, valid transitions, bounded log size, and complete cycle pairs where expected.
+
 Each cell follows a simple probabilistic state machine:
 
 | From state | Possible transitions | Notes |
 | --- | --- | --- |
-| `running` | `running` → fault (4 % / tick) | fault code drawn from E001–E101 |
-| `running` | `running` → paused (3 % / tick) | |
+| `running` | `running` -> fault (4 % / tick) | fault code drawn from E001-E101 |
+| `running` | `running` -> paused (3 % / tick) | |
 | `running` | cycle start (35 % / tick, if no active cycle) | |
-| `running` | cycle end (45 % / tick, once cycle is ≥ 60 s old) | duration derived from timestamps |
-| `fault` | `fault` → running (55 % / tick) | |
-| `paused` | `paused` → running (65 % / tick) | |
+| `running` | cycle end (45 % / tick, once cycle is >= 60 s old) | duration derived from timestamps |
+| `fault` | `fault` -> running (55 % / tick) | |
+| `paused` | `paused` -> running (65 % / tick) | |
 
 `GET /metrics/live` runs the accumulated event log through the same normalization and metric pipeline as the static endpoint, so availability, cycle times, fault counts, and the throughput chart all update on each frontend poll.
 
@@ -161,7 +163,7 @@ npm install
 npm run dev
 ```
 
-The dashboard connects to `GET /metrics/live` and polls every five seconds. Start the API first (see above), then start the frontend. No additional configuration is needed — the Vite dev server proxies `/api/*` to `http://localhost:8000`.
+The dashboard connects to `GET /metrics/live` and polls every five seconds. Start the API first (see above), then start the frontend. No additional configuration is needed - the Vite dev server proxies `/api/*` to `http://localhost:8000`.
 
 To use static mock data instead (no backend required), set `VITE_USE_MOCK=true` in `frontend/.env.local`.
 
@@ -197,7 +199,7 @@ Raw events are normalized into `NormalizedEvent`:
 | `kind` | `state_changed`, `cycle_start`, `cycle_end`, `production_count`, `operator_action`, `maintenance`, `unknown` |
 | `state` | Canonical state for status events |
 | `program_state` | `play`, `pause`, `stop`, `unknown` |
-| `program_id` | Normalized program id, for example `BoxInspection` → `Box_Inspection` |
+| `program_id` | Normalized program id, for example `BoxInspection` -> `Box_Inspection` |
 | `cycle_duration_seconds` | Optional reported duration on cycle end |
 | `faults` | Structured fault code/message pairs |
 | `raw_event` | Original event for auditability |
@@ -241,7 +243,7 @@ If `cycle_duration_seconds` is missing on `cycle_end`, the backend derives durat
 
 ### Inconsistent event naming and schema drift
 
-The normalizer maps aliases such as `cycle-start`, `cycle_begin`, and `cycleStart` into `cycle_start`, and state aliases into canonical states. Program ids are canonicalized where known, for example `BoxInspection` → `Box_Inspection`. Unknown names do not crash the job; they become `unknown_*` findings.
+The normalizer maps aliases such as `cycle-start`, `cycle_begin`, and `cycleStart` into `cycle_start`, and state aliases into canonical states. Program ids are canonicalized where known, for example `BoxInspection` -> `Box_Inspection`. Unknown names do not crash the job; they become `unknown_*` findings.
 
 ## Metrics calculated
 
@@ -303,14 +305,14 @@ A production-ready system would split ingestion, normalization, metric derivatio
 
 ```text
 Robot cells
-  → gateway / collector
-  → durable log such as Kafka, Redpanda, Kinesis, or Pub/Sub
-  → schema validation + normalization service
-  → append-only normalized event store
-  → stream processor for live metrics
-  → warehouse/lakehouse for recomputation
-  → metrics read models and dashboard API
-  → operator dashboard + engineering analysis tools
+  -> gateway / collector
+  -> durable log such as Kafka, Redpanda, Kinesis, or Pub/Sub
+  -> schema validation + normalization service
+  -> append-only normalized event store
+  -> stream processor for live metrics
+  -> warehouse/lakehouse for recomputation
+  -> metrics read models and dashboard API
+  -> operator dashboard + engineering analysis tools
 ```
 
 ### Near real-time ingestion

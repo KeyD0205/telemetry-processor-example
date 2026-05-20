@@ -8,12 +8,12 @@ This keeps the solution easy to reason about during an interview because the eve
 
 ```text
 raw JSON events
-  → validation and normalization
-  → duplicate/out-of-order/schema-drift detection
-  → canonical event stream sorted by cell and time
-  → state-duration and cycle-pairing logic
-  → JSON metrics report
-  → CLI / API / dashboard
+  -> validation and normalization
+  -> duplicate/out-of-order/schema-drift detection
+  -> canonical event stream sorted by cell and time
+  -> state-duration and cycle-pairing logic
+  -> JSON metrics report
+  -> CLI / API / dashboard
 ```
 
 The implementation is intentionally deterministic and side-effect free in the core pipeline. The same functions can be used for command-line processing, API requests, tests, stream processing, or historical recomputation.
@@ -95,14 +95,14 @@ For a production system, I would evolve this into an event-driven architecture:
 
 ```text
 robot cell telemetry
-  → edge collector / gateway
-  → durable event log partitioned by cell_id
-  → normalization service with schema adapters
-  → immutable raw event store
-  → normalized event store
-  → stream metrics processor
-  → real-time read model for dashboards
-  → historical warehouse for recomputation and analytics
+  -> edge collector / gateway
+  -> durable event log partitioned by cell_id
+  -> normalization service with schema adapters
+  -> immutable raw event store
+  -> normalized event store
+  -> stream metrics processor
+  -> real-time read model for dashboards
+  -> historical warehouse for recomputation and analytics
 ```
 
 ### Near real-time ingestion
@@ -140,7 +140,7 @@ The current dashboard assumes two cells and hard-codes a side-by-side comparison
 - Replace the table with a filterable cell grid, one card per cell, showing state badge, availability, and fault indicator. Operators can scan at a glance and click into a cell detail view.
 - Move the throughput chart and fault list into a per-cell drill-down page rather than showing fleet aggregates alongside individual cells.
 - Add a fleet summary header row (total cells, cells in fault, fleet availability) that is always visible regardless of how many cells are present.
-- Filter and sort controls (by state, by availability, by fault count) become essential once there are more than 8–10 cells.
+- Filter and sort controls (by state, by availability, by fault count) become essential once there are more than 8-10 cells.
 - Consider virtualising the cell list for very large fleets (50+ cells) to keep rendering cost flat.
 
 ## Recommendations for further automation and scalability
