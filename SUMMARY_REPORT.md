@@ -28,7 +28,8 @@ The implementation is intentionally deterministic and side-effect free in the co
 - Defines canonical cell states and transition validation.
 - Handles duplicate events, missing events, out-of-order events, inconsistent naming, schema drift, and missing fields.
 - Calculates uptime, downtime, throughput, cycle time, fault time, maintenance time, availability, state durations, recent faults, and data-quality issue counts.
-- Includes tests for normalization, duplicate removal, out-of-order sorting, metric output, cycle-pairing edge cases, and issue detection.
+- Includes 10 backend tests covering normalization, duplicate removal, out-of-order sorting, metric output, availability calculation, state-transition validation, cycle-pairing edge cases, issue detection, and API endpoints.
+- Includes 8 frontend component tests (vitest + @testing-library/react) covering dashboard rendering, loading/empty/error states, cell comparison, fault list, data quality panel, and throughput chart.
 - Includes an architecture note for production evolution.
 
 ### Backend section
