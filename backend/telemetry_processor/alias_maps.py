@@ -14,7 +14,13 @@ EVENT_NAME_ALIASES: dict[str, EventKind] = {
     "cycle-finish": EventKind.CYCLE_END,
     "cycle_finished": EventKind.CYCLE_END,
     "production_count": EventKind.PRODUCTION_COUNT,
+    "production-count": EventKind.PRODUCTION_COUNT,
+    "productioncount": EventKind.PRODUCTION_COUNT,
+    "produced_count": EventKind.PRODUCTION_COUNT,
+    "units_produced": EventKind.PRODUCTION_COUNT,
     "operator_action": EventKind.OPERATOR_ACTION,
+    "operator-action": EventKind.OPERATOR_ACTION,
+    "operatoraction": EventKind.OPERATOR_ACTION,
     "maintenance": EventKind.MAINTENANCE,
 }
 

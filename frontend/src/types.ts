@@ -49,6 +49,11 @@ export interface CellMetrics {
   productive_ratio_excluding_maintenance: number | null;
   throughput_cycles_per_hour: number | null;
   completed_cycles: number;
+  production_count_events: number;
+  latest_production_count: number | null;
+  produced_units_delta: number;
+  production_count_resets: number;
+  operator_action_count: number;
   cycle_time_seconds: CycleTimeStats;
   state_durations_seconds: Record<string, number>;
   throughput_over_time: ThroughputBucket[];
@@ -87,6 +92,10 @@ export interface TelemetryReport {
     fault_seconds: number;
     availability: number | null;
     throughput_cycles_per_hour: number | null;
+    production_count_events: number;
+    latest_production_count_total: number | null;
+    produced_units_delta: number;
+    operator_action_count: number;
     cycle_time_seconds: CycleTimeStats;
     throughput_over_time: ThroughputBucket[];
     recent_faults: FaultEvent[];

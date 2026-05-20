@@ -57,6 +57,7 @@ class NormalizedEvent:
     program_id: str | None = None
     cycle_duration_seconds: float | None = None
     production_count: int | None = None
+    operator_action: str | None = None
     faults: tuple[Fault, ...] = ()
     raw_event: Mapping[str, Any] = field(default_factory=dict, compare=False)
 

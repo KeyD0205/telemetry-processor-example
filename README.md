@@ -66,7 +66,7 @@ python -m pytest -q
 Expected test result:
 
 ```text
-10 passed
+14 passed
 ```
 
 ## Run the processing pipeline
@@ -138,7 +138,7 @@ Example request body for `POST /process`:
 
 `telemetry_processor/simulator.py` runs a synthetic two-cell fleet in a background thread. On startup it seeds three hours of simulated history, then appends new events every three real seconds (each tick advances the simulation clock by 30 seconds). The event log is capped at 1 000 entries; the oldest events are evicted as new ones arrive.
 
-This simulator is demo-only. It is intentionally useful for showing a changing dashboard, but it is not production-like: it is random, singleton-backed, starts a thread implicitly from the API module, and does not currently have seed- or invariant-based tests. Production ingestion should use an explicit event source and deterministic state handling. Tests for simulator behavior should use a fixed seed and assert core invariants such as monotonic timestamps, valid transitions, bounded log size, and complete cycle pairs where expected.
+This simulator is demo-only. It is intentionally useful for showing a changing dashboard, but it is not production-like: it is random, singleton-backed, starts a thread implicitly when the live endpoint is first used, and does not currently have seed- or invariant-based tests. Production ingestion should use an explicit event source and deterministic state handling. Tests for simulator behavior should use a fixed seed and assert core invariants such as monotonic timestamps, valid transitions, bounded log size, and complete cycle pairs where expected.
 
 Each cell follows a simple probabilistic state machine:
 
@@ -201,6 +201,8 @@ Raw events are normalized into `NormalizedEvent`:
 | `program_state` | `play`, `pause`, `stop`, `unknown` |
 | `program_id` | Normalized program id, for example `BoxInspection` -> `Box_Inspection` |
 | `cycle_duration_seconds` | Optional reported duration on cycle end |
+| `production_count` | Optional count from `production_count` events, treated separately from cycle-derived throughput |
+| `operator_action` | Optional normalized action label from operator-action events |
 | `faults` | Structured fault code/message pairs |
 | `raw_event` | Original event for auditability |
 
@@ -245,6 +247,8 @@ If `cycle_duration_seconds` is missing on `cycle_end`, the backend derives durat
 
 The normalizer maps aliases such as `cycle-start`, `cycle_begin`, and `cycleStart` into `cycle_start`, and state aliases into canonical states. Program ids are canonicalized where known, for example `BoxInspection` -> `Box_Inspection`. Unknown names do not crash the job; they become `unknown_*` findings.
 
+Production-count aliases such as `production_count`, `produced_count`, and `units_produced` are parsed into `NormalizedEvent.production_count` when an integer count is present. Fractional, invalid, missing, or negative count values are kept out of metrics and reported as data-quality findings. Operator-action aliases are normalized into `NormalizedEvent.operator_action` when an action payload such as `action`, `action_type`, or `operator.action` is present; events without an action payload are still counted for auditability.
+
 ## Metrics calculated
 
 At cell and fleet level:
@@ -258,6 +262,8 @@ At cell and fleet level:
 - productive ratio excluding maintenance;
 - completed cycles;
 - throughput in cycles per observed cell-hour;
+- production-count events, latest production count, produced-unit delta, and counter resets when production-count events are present;
+- operator-action event count, currently used as an audit/annotation signal rather than an operational metric;
 - cycle-time average, median, p95, min, max;
 - throughput over time;
 - recent faults and unique fault codes;
@@ -295,6 +301,10 @@ Notable findings include:
 - Reported `cycle_duration_seconds` is retained for audit, but timestamp-derived duration is used for metrics when a complete start/end pair exists.
 - Uptime includes `running` and `slowed`; slowed is still productive but visible to operators as degraded.
 - Fault and non-fault downtime are separated so operations can distinguish safety stops, waiting, pauses, and faults.
+- Cycle-derived throughput and production-count metrics are intentionally separate. Cycle pairs describe process completion and cycle time; production-count events describe produced units or cumulative counters when the source stream provides them.
+- Production counters are treated as cumulative per cell. Positive deltas are counted as observed produced units; counter drops are reported as resets and are not bridged.
+- Operator actions are normalized and counted, but the current source stream does not define action payload semantics, so they are not used to change cell state or availability.
+- Maintenance time is measured from canonical maintenance states such as `mt-human-in-stop-zone`. Standalone `maintenance` events are normalized, but they would need explicit start/end semantics or a state mapping before they could change maintenance-duration metrics.
 - The final known state is carried forward until the last event timestamp for that cell. No duration is inferred beyond the processing window.
 - Duplicate detection currently drops exact raw duplicates only. Near-duplicates are better handled with source event ids or device sequence numbers in production.
 - The frontend uses generated processed data rather than recalculating in the browser. This avoids metric drift between backend and UI.

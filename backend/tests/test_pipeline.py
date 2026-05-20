@@ -122,6 +122,32 @@ def test_api_health_endpoint() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_production_counts_are_reported_separately_from_cycles() -> None:
+    raw = [
+        {"cell_id": "cell-a", "event_time": {"sec": 0, "nanosec": 0}, "event_type": "production_count", "production_count": 10},
+        {"cell_id": "cell-a", "event_time": {"sec": 60, "nanosec": 0}, "event_type": "production_count", "production_count": 14},
+        {"cell_id": "cell-a", "event_time": {"sec": 120, "nanosec": 0}, "event_type": "operator_action"},
+        {"cell_id": "cell-a", "event_time": {"sec": 180, "nanosec": 0}, "event_type": "production_count", "production_count": 3},
+        {"cell_id": "cell-a", "event_time": {"sec": 240, "nanosec": 0}, "event_type": "production_count", "production_count": 8},
+    ]
+
+    report = process_raw_events(raw)
+    cell = report["cells"][0]
+    issue_codes = {issue["code"] for issue in report["data_quality"]["issues"]}
+
+    assert report["fleet"]["completed_cycles"] == 0
+    assert report["fleet"]["production_count_events"] == 4
+    assert report["fleet"]["latest_production_count_total"] == 8
+    assert report["fleet"]["produced_units_delta"] == 9
+    assert report["fleet"]["operator_action_count"] == 1
+    assert cell["production_count_events"] == 4
+    assert cell["latest_production_count"] == 8
+    assert cell["produced_units_delta"] == 9
+    assert cell["production_count_resets"] == 1
+    assert cell["operator_action_count"] == 1
+    assert "production_count_reset" in issue_codes
+
+
 def test_api_process_endpoint_returns_metrics() -> None:
     from fastapi.testclient import TestClient
     from telemetry_processor.api import app

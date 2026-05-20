@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from datetime import timezone
 from typing import Any, Iterable, Mapping
@@ -10,8 +11,6 @@ from .models import CellState, DataQualityIssue, EventKind, Fault, NormalizedEve
 from .time_utils import datetime_from_ns, iso_from_ns, timestamp_ns_from_event_time
 from .alias_maps import EVENT_NAME_ALIASES, STATE_ALIASES, PROGRAM_STATE_ALIASES, PROGRAM_ID_ALIASES
 
-# Logging setup
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -50,6 +49,57 @@ def normalize_program_id(raw: Any) -> str | None:
     token = normalize_token(raw_text)
     compact = compact_token(raw_text)
     return PROGRAM_ID_ALIASES.get(token) or PROGRAM_ID_ALIASES.get(compact) or raw_text
+
+
+def production_count_from_event(raw: Mapping[str, Any]) -> Any:
+    for key in ("production_count", "produced_count", "units_produced", "count", "quantity"):
+        if key in raw:
+            return raw[key]
+
+    production = raw.get("production")
+    if isinstance(production, Mapping):
+        for key in ("count", "total", "quantity", "units_produced"):
+            if key in production:
+                return production[key]
+
+    return None
+
+
+def parse_production_count(raw: Any) -> int:
+    if isinstance(raw, bool):
+        raise ValueError("production_count must be an integer, not a boolean")
+    if isinstance(raw, int):
+        return raw
+    if isinstance(raw, float):
+        if raw.is_integer():
+            return int(raw)
+        raise ValueError("production_count must be a whole number")
+    if isinstance(raw, str):
+        text = raw.strip()
+        if re.fullmatch(r"[+-]?\d+", text):
+            return int(text)
+        raise ValueError("production_count must be an integer string")
+    raise ValueError("production_count must be an integer")
+
+
+def operator_action_from_event(raw: Mapping[str, Any]) -> str | None:
+    for key in ("operator_action", "action", "action_type", "operator_command"):
+        value = raw.get(key)
+        if value is not None:
+            action = str(value).strip()
+            if action:
+                return action
+
+    operator = raw.get("operator")
+    if isinstance(operator, Mapping):
+        for key in ("action", "action_type", "command"):
+            value = operator.get(key)
+            if value is not None:
+                action = str(value).strip()
+                if action:
+                    return action
+
+    return None
 
 
 def canonical_event_hash(event: Mapping[str, Any]) -> str:
@@ -180,6 +230,8 @@ def normalize_events(raw_events: Iterable[Mapping[str, Any]]) -> tuple[list[Norm
         raw_state = None
         program_state = None
         program_id = None
+        production_count = None
+        operator_action = None
         faults: tuple[Fault, ...] = ()
 
         if has_cell_status:
@@ -274,6 +326,55 @@ def normalize_events(raw_events: Iterable[Mapping[str, Any]]) -> tuple[list[Norm
                 message="cycle_end does not include cycle_duration_seconds; duration will be derived from the matched cycle_start when possible.",
             ))
 
+        if kind == EventKind.PRODUCTION_COUNT:
+            raw_production_count = production_count_from_event(raw)
+            if raw_production_count is None:
+                issues.append(issue(
+                    severity="warning",
+                    code="missing_production_count",
+                    cell_id=cell_id,
+                    timestamp_ns=timestamp_ns,
+                    source_index=index,
+                    message="production_count event did not include a count field.",
+                ))
+            else:
+                try:
+                    production_count = parse_production_count(raw_production_count)
+                except ValueError as exc:
+                    issues.append(issue(
+                        severity="warning",
+                        code="invalid_production_count",
+                        cell_id=cell_id,
+                        timestamp_ns=timestamp_ns,
+                        source_index=index,
+                        message=f"{exc}; value was ignored.",
+                        context={"raw_production_count": raw_production_count},
+                    ))
+                else:
+                    if production_count < 0:
+                        issues.append(issue(
+                            severity="warning",
+                            code="invalid_production_count",
+                            cell_id=cell_id,
+                            timestamp_ns=timestamp_ns,
+                            source_index=index,
+                            message="production_count value was negative and was ignored.",
+                            context={"raw_production_count": raw_production_count},
+                        ))
+                        production_count = None
+
+        if kind == EventKind.OPERATOR_ACTION:
+            operator_action = operator_action_from_event(raw)
+            if operator_action is None:
+                issues.append(issue(
+                    severity="info",
+                    code="missing_operator_action",
+                    cell_id=cell_id,
+                    timestamp_ns=timestamp_ns,
+                    source_index=index,
+                    message="operator_action event did not include an action payload; event is still counted for auditability.",
+                ))
+
         normalized.append(NormalizedEvent(
             event_id=event_id,
             source_index=index,
@@ -286,6 +387,8 @@ def normalize_events(raw_events: Iterable[Mapping[str, Any]]) -> tuple[list[Norm
             program_state=program_state,
             program_id=program_id,
             cycle_duration_seconds=cycle_duration,
+            production_count=production_count,
+            operator_action=operator_action,
             faults=faults,
             raw_event=raw,
         ))

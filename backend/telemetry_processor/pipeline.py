@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-
-import logging
-logger = logging.getLogger(__name__)
-
 from .metrics import compute_metrics
-from .models import DataQualityIssue, NormalizedEvent
 from .normalization import normalize_events
 from .state_machine import validate_state_transitions
+
+logger = logging.getLogger(__name__)
 
 
 def load_raw_events(path: str | Path) -> list[Mapping[str, Any]]:

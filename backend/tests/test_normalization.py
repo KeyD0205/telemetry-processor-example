@@ -53,3 +53,58 @@ def test_records_out_of_order_events_but_sorts_them() -> None:
 
     assert [event.kind for event in events] == [EventKind.CYCLE_START, EventKind.CYCLE_END]
     assert any(issue.code == "out_of_order_event" for issue in issues)
+
+
+def test_parses_production_count_aliases() -> None:
+    raw = [{
+        "cell_id": "cell-a",
+        "event_time": {"sec": 30, "nanosec": 0},
+        "event_type": "units_produced",
+        "production": {"total": "42"},
+    }]
+
+    events, issues = normalize_events(raw)
+
+    assert len(events) == 1
+    assert events[0].kind == EventKind.PRODUCTION_COUNT
+    assert events[0].production_count == 42
+    assert not any(issue.code == "invalid_production_count" for issue in issues)
+
+
+def test_flags_invalid_production_count() -> None:
+    raw = [
+        {
+            "cell_id": "cell-a",
+            "event_time": {"sec": 30, "nanosec": 0},
+            "event_type": "production_count",
+            "production_count": "not-a-number",
+        },
+        {
+            "cell_id": "cell-a",
+            "event_time": {"sec": 31, "nanosec": 0},
+            "event_type": "production_count",
+            "production_count": 3.7,
+        },
+    ]
+
+    events, issues = normalize_events(raw)
+
+    assert [event.kind for event in events] == [EventKind.PRODUCTION_COUNT, EventKind.PRODUCTION_COUNT]
+    assert [event.production_count for event in events] == [None, None]
+    assert sum(1 for issue in issues if issue.code == "invalid_production_count") == 2
+
+
+def test_normalizes_operator_action_payload() -> None:
+    raw = [{
+        "cell_id": "cell-a",
+        "event_time": {"sec": 40, "nanosec": 0},
+        "event_type": "operator-action",
+        "operator": {"action": "ack_fault"},
+    }]
+
+    events, issues = normalize_events(raw)
+
+    assert len(events) == 1
+    assert events[0].kind == EventKind.OPERATOR_ACTION
+    assert events[0].operator_action == "ack_fault"
+    assert not any(issue.code == "missing_operator_action" for issue in issues)

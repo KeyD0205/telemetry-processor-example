@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
-
-import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s %(message)s')
+logging.basicConfig(level=logging.ERROR, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
 from .pipeline import process_file, write_json_report
 
@@ -27,7 +26,7 @@ def format_pct(value: float | None) -> str:
 def render_table(report: dict[str, Any]) -> str:
     lines = []
     lines.append("Telemetry metrics summary")
-    lines.append(f"Window: {report['window']['start']} → {report['window']['end']}")
+    lines.append(f"Window: {report['window']['start']} -> {report['window']['end']}")
     lines.append(f"Cells: {report['cell_count']} | Events processed: {report['normalized_event_count']} | Data quality issues: {report['data_quality']['issue_count']}")
     lines.append("")
     cells = report["cells"]

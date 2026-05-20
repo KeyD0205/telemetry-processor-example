@@ -71,6 +71,10 @@ def compute_metrics(events: Iterable[NormalizedEvent]) -> tuple[dict[str, Any], 
     fleet_cycle_durations: list[float] = []
     fleet_throughput_buckets: Counter[str] = Counter()
     fleet_faults: list[dict[str, Any]] = []
+    fleet_production_count_events = 0
+    fleet_produced_units_delta = 0
+    fleet_latest_production_count = 0
+    fleet_operator_action_count = 0
 
     for cell_id, cell_events in events_by_cell.items():
         first_ns = min(event.timestamp_ns for event in cell_events)
@@ -203,6 +207,40 @@ def compute_metrics(events: Iterable[NormalizedEvent]) -> tuple[dict[str, Any], 
         completed_count = len(completed_cycles)
         fleet_completed_cycles += completed_count
 
+        production_events = [
+            event for event in cell_events
+            if event.kind == EventKind.PRODUCTION_COUNT and event.production_count is not None
+        ]
+        production_count_events = len(production_events)
+        operator_action_count = sum(1 for event in cell_events if event.kind == EventKind.OPERATOR_ACTION)
+        produced_units_delta = 0
+        production_count_resets = 0
+        for previous, current in zip(production_events, production_events[1:]):
+            previous_count = previous.production_count
+            current_count = current.production_count
+            if previous_count is None or current_count is None:
+                continue
+            delta = current_count - previous_count
+            if delta >= 0:
+                produced_units_delta += delta
+            else:
+                production_count_resets += 1
+                issues.append(DataQualityIssue(
+                    severity="warning",
+                    code="production_count_reset",
+                    cell_id=cell_id,
+                    timestamp=current.timestamp_iso,
+                    source_index=current.source_index,
+                    message="production_count decreased; treated as a counter reset and not bridged across the drop.",
+                    context={"previous_count": previous_count, "current_count": current_count},
+                ))
+
+        latest_production_count = production_events[-1].production_count if production_events else None
+        fleet_production_count_events += production_count_events
+        fleet_produced_units_delta += produced_units_delta
+        fleet_latest_production_count += latest_production_count or 0
+        fleet_operator_action_count += operator_action_count
+
         status_events = [event for event in cell_events if event.kind == EventKind.STATE_CHANGED]
         current_state_event = status_events[-1] if status_events else None
         current_state = current_state_event.state.value if current_state_event and current_state_event.state else CellState.UNKNOWN.value
@@ -239,6 +277,11 @@ def compute_metrics(events: Iterable[NormalizedEvent]) -> tuple[dict[str, Any], 
             "productive_ratio_excluding_maintenance": round(uptime_seconds / (observed_seconds - maintenance_seconds), 4) if observed_seconds > maintenance_seconds else None,
             "throughput_cycles_per_hour": round(completed_count / (observed_seconds / SECONDS_PER_HOUR), 3) if observed_seconds else None,
             "completed_cycles": completed_count,
+            "production_count_events": production_count_events,
+            "latest_production_count": latest_production_count,
+            "produced_units_delta": produced_units_delta,
+            "production_count_resets": production_count_resets,
+            "operator_action_count": operator_action_count,
             "cycle_time_seconds": {
                 "avg": round(mean(cycle_durations), 3) if cycle_durations else None,
                 "median": round(median(cycle_durations), 3) if cycle_durations else None,
@@ -279,6 +322,10 @@ def compute_metrics(events: Iterable[NormalizedEvent]) -> tuple[dict[str, Any], 
             "fault_seconds": round(fleet_fault_seconds, 3),
             "availability": round(fleet_uptime_seconds / fleet_observed_seconds, 4) if fleet_observed_seconds else None,
             "throughput_cycles_per_hour": round(fleet_completed_cycles / (fleet_observed_seconds / SECONDS_PER_HOUR), 3) if fleet_observed_seconds else None,
+            "production_count_events": fleet_production_count_events,
+            "latest_production_count_total": fleet_latest_production_count if fleet_production_count_events else None,
+            "produced_units_delta": fleet_produced_units_delta,
+            "operator_action_count": fleet_operator_action_count,
             "cycle_time_seconds": {
                 "avg": round(mean(fleet_cycle_durations), 3) if fleet_cycle_durations else None,
                 "median": round(median(fleet_cycle_durations), 3) if fleet_cycle_durations else None,

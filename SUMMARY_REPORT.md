@@ -27,8 +27,8 @@ The implementation is intentionally deterministic and side-effect free in the co
 - Normalizes inconsistent states, event names, program ids, timestamps, and fault fields.
 - Defines canonical cell states and transition validation.
 - Handles duplicate events, missing events, out-of-order events, inconsistent naming, schema drift, and missing fields.
-- Calculates uptime, downtime, throughput, cycle time, fault time, maintenance time, availability, state durations, recent faults, and data-quality issue counts.
-- Includes 10 backend tests covering normalization, duplicate removal, out-of-order sorting, metric output, availability calculation, state-transition validation, cycle-pairing edge cases, issue detection, and API endpoints.
+- Calculates uptime, downtime, throughput, cycle time, fault time, maintenance time, availability, state durations, recent faults, production-count metrics, operator-action counts, and data-quality issue counts.
+- Includes 14 backend tests covering normalization, production-count parsing, operator-action payload normalization, duplicate removal, out-of-order sorting, metric output, availability calculation, state-transition validation, cycle-pairing edge cases, issue detection, and API endpoints.
 - Includes 8 frontend component tests (vitest + @testing-library/react) covering dashboard rendering, loading/empty/error states, cell comparison, fault list, data quality panel, and throughput chart.
 - Includes an architecture note for production evolution.
 
@@ -84,6 +84,14 @@ One `cell-a` cycle reports 110 seconds, while event timestamps imply 120 seconds
 ### Inconsistent naming
 
 `BoxInspection` is normalized to `Box_Inspection`. Vendor-style cell states such as `op-program-running`, `op-human-in-stop-zone`, and `mt-human-in-stop-zone` are normalized into canonical operational states.
+
+### Production counts and operator actions
+
+The canonical model includes production-count and operator-action events because they are part of the assignment domain. Production-count events are parsed when an integer count is present and reported as count events, latest counters, observed positive deltas, and counter resets. Fractional, invalid, missing, or negative counts are excluded from metrics and reported as data-quality findings. The provided stream's headline throughput remains cycle-derived because cycle start/end pairs are the strongest available signal for cycle time and throughput. Operator actions are normalized when an action payload is available and counted for auditability, but this dataset does not define action-specific semantics that should alter state or availability.
+
+### Maintenance windows
+
+Maintenance time is measured from canonical maintenance states such as `mt-human-in-stop-zone`. Standalone `maintenance` events are normalized into the canonical model, but they would need explicit start/end semantics or a state mapping before they could safely change maintenance-duration metrics.
 
 ### Missing state transitions
 
@@ -159,5 +167,6 @@ The current dashboard assumes two cells and hard-codes a side-by-side comparison
 
 - Exact duplicate detection is implemented now; fuzzy duplicate detection would require stronger source identifiers to avoid dropping legitimate repeated status events.
 - Timestamp-derived cycle time is used as the metric source of truth, even when reported duration exists. This is more consistent but assumes event timestamps are reliable.
+- Cycle throughput and production-count deltas are reported separately. This avoids treating a cumulative production counter as equivalent to process cycle completion.
 - The final known state is carried only until the last event timestamp in the cell's window. The system does not infer time beyond observed data.
 - The frontend polls `GET /metrics/live` every 5 seconds. The live endpoint runs the simulator's event log through the real pipeline on each request, so the dashboard reflects genuinely changing metrics. A production system would replace the simulator with a durable event log and expose a materialized read model rather than reprocessing on every poll.
